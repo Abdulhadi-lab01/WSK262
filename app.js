@@ -5,9 +5,8 @@ const app = express();
 app.get('/', (req, res) => {
     res.send('Hello world');
 });
-
-app.listen(3000, () => {
-    console.log('Server running on http://localhost:3000');
+app.listen(3000, '0.0.0.0', () => {
+    console.log('Server running on port 3000');
 });
 app.get('/api/v1/cat', (req, res) => {
     const cat = {
