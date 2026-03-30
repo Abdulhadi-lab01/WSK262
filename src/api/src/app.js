@@ -1,9 +1,10 @@
 import express from 'express';
-import {getCat,getCatById,postCat,putCat,deleteCat} from './api/controllers/cat-controller.js'
-import {getUser, getUserById, postUser, putUser, deleteUser} from './api/controllers/user-controller.js';
+import {getCat,getCatById,postCat,putCat,deleteCat} from '../controllers/cat-controller.js'
+import {getUser, getUserById, postUser, putUser, deleteUser} from '../controllers/user-controller.js';
 
 const app = express();
-
+app.use(express.json());
+app.use(express.urlencoded());
 app.get('/', (req, res) => {
     res.send('Hello world');
 });
