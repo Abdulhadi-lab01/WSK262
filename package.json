@@ -2,10 +2,10 @@
   "name": "wsk262",
   "version": "1.0.0",
   "description": "",
-  "main": "src/api/src/index.js",
+  "main": "src/index.js",
   "scripts": {
-    "dev": "nodemon src/api/src/app.js",
-    "start": "node src/api/src/app.js"
+    "dev": "nodemon src/app.js",
+    "start": "node src/app.js"
   },
   "private": true,
   "repository": {
@@ -22,7 +22,8 @@
   "homepage": "https://github.com/Abdulhadi-lab01/WSK262#readme",
   "dependencies": {
     "express": "^5.2.1",
-    "multer": "^2.1.1"
+    "multer": "^2.1.1",
+    "sharp": "^0.34.5"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"
