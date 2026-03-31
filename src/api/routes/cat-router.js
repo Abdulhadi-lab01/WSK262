@@ -1,31 +1,41 @@
-import express from 'express';
 import {
+    deleteCat,
     getCat,
     getCatById,
     postCat,
     putCat,
-    deleteCat,
 } from '../controllers/cat-controller.js';
-const catRouter = express.Router();
 
-
-// /api/v1/cats
-
-catRouter.route('/').get(getCat).post(postCat);
-
+import { createThumbnail } from '../../middlewares/upload.js';
 
 import multer from 'multer';
-const upload = multer({ dest: 'uploads/' })
+const upload = multer({ dest: 'uploads/' });
 
-catRouter.post('/', upload.single('cat'), postCat);
+import express from 'express';
 
+const catRouter = express.Router();
 
+// /api/v1/cats
+catRouter
+    .route('/')
+    .get(getCat)
+    .post(upload.single('cat'), createThumbnail, postCat);
 
+// ❌ DUPLICATE ROUTES (commented out to avoid conflicts)
 
+// catRouter.get('/', getCat);
 
+// catRouter.post('/', upload.single('cat'), postCat);
+// ⚠️ This one skips createThumbnail → not correct for assignment 4
 
-catRouter.route('/').get(getCat).post(postCat).post(upload.single('cat'), postCat);
+// catRouter.get('/', (req, res) => {
+//    return getCat(req, res);
+// });
 
-catRouter.route('/:id').get(getCatById).put(putCat).delete(deleteCat);
+catRouter
+    .route('/:id')
+    .get(getCatById)
+    .put(putCat)
+    .delete(deleteCat);
 
 export default catRouter;
