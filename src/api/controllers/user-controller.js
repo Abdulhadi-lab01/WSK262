@@ -1,18 +1,18 @@
+import bcrypt from 'bcrypt';
 import {
-    listAllUsers,
-    findUserById,
     addUser,
+    findUserById,
+    listAllUsers,
+    modifyUser,
+    removeUser,
 } from '../models/user-model.js';
 
-// GET /api/v1/user
-const getUser = (req, res) => {
-    res.json(listAllUsers());
+const getUser = async (req, res) => {
+    res.json(await listAllUsers());
 };
 
-// GET /api/v1/user/:id
-const getUserById = (req, res) => {
-    const user = findUserById(req.params.id);
-
+const getUserById = async (req, res) => {
+    const user = await findUserById(req.params.id);
     if (user) {
         res.json(user);
     } else {
@@ -20,28 +20,37 @@ const getUserById = (req, res) => {
     }
 };
 
-// POST /api/v1/user
-const postUser = (req, res) => {
-    const result = addUser(req.body);
-
+const postUser = async (req, res) => {
+    // modify req.body.password:
+    req.body.password = bcrypt.hashSync(req.body.password, 10);
+    const result = await addUser(req.body);
     if (result.user_id) {
-        res.status(201).json({
-            message: 'New user added.',
-            result,
-        });
+        res.status(201);
+        res.json({message: 'New user added.', result});
     } else {
         res.sendStatus(400);
     }
 };
 
-// PUT /api/v1/user/:id
-const putUser = (req, res) => {
-    res.json({message: 'User item updated.'});
+// PUT /api/v1/users/:id - return hard coded json response:
+// {message: 'user item updated.'}
+
+const putUser = async (req, res) => {
+    const result = await modifyUser(req.body, req.params.id);
+    if (result.message === 'success') {
+        res.json({message: 'user item updated.'});
+    } else {
+        res.sendStatus(400);
+    }
 };
 
-// DELETE /api/v1/user/:id
-const deleteUser = (req, res) => {
-    res.json({message: 'User item deleted.'});
+const deleteUser = async (req, res) => {
+    const result = await removeUser(req.params.id);
+    if (result.message === 'success') {
+        res.json({message: 'user item deleted.'});
+    } else {
+        res.sendStatus(400);
+    }
 };
 
 export {getUser, getUserById, postUser, putUser, deleteUser};

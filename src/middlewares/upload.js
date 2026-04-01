@@ -1,30 +1,27 @@
 import sharp from 'sharp';
-import path from 'path';
 
 const createThumbnail = async (req, res, next) => {
+    // console.log('todo: tee kuvakäsittely', req.file);
     if (!req.file) {
-        return next();
-    }
-
-    try {
-        const { path: filePath, filename, destination } = req.file;
-
-        const name = path.parse(filename).name;
-        const thumbName = name + '_thumb.png';
-        const thumbPath = path.join(destination, thumbName);
-
-        await sharp(filePath)
-            .resize(160, 160)
-            .png()
-            .toFile(thumbPath);
-
-        console.log('Thumbnail created:', thumbPath);
-
         next();
-    } catch (err) {
-        console.error(err);
-        next(err);
+        return;
     }
+
+    let extension = 'jpg';
+    if (req.file.mimetype === 'image/png') {
+        // if (req.file.mimetype.includes('/png')) {
+        extension = 'png';
+    } else if (req.file.mimetype === 'image/gif') {
+        extension = 'gif';
+    } else if (req.file.mimetype === 'image/webp') {
+        extension = 'webp';
+    }
+
+    await sharp(req.file.path)
+        .resize(160, 160)
+        .toFile(`${req.file.path}_thumb.${extension}`);
+
+    next();
 };
 
-export { createThumbnail };
+export {createThumbnail};
