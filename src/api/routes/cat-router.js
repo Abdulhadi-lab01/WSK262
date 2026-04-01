@@ -21,12 +21,10 @@ catRouter
     .get(getCat)
     .post(upload.single('cat'), createThumbnail, postCat);
 
-// ❌ DUPLICATE ROUTES (commented out to avoid conflicts)
 
 // catRouter.get('/', getCat);
 
 // catRouter.post('/', upload.single('cat'), postCat);
-// ⚠️ This one skips createThumbnail → not correct for assignment 4
 
 // catRouter.get('/', (req, res) => {
 //    return getCat(req, res);
