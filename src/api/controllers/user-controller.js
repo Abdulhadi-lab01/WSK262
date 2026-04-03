@@ -7,50 +7,88 @@ import {
     removeUser,
 } from '../models/user-model.js';
 
-const getUser = async (req, res) => {
-    res.json(await listAllUsers());
-};
-
-const getUserById = async (req, res) => {
-    const user = await findUserById(req.params.id);
-    if (user) {
-        res.json(user);
-    } else {
-        res.sendStatus(404);
+// GET ALL
+const getUser = async (req, res, next) => {
+    try {
+        const users = await listAllUsers();
+        res.json(users);
+    } catch (err) {
+        next(err);
     }
 };
 
-const postUser = async (req, res) => {
-    // modify req.body.password:
-    req.body.password = bcrypt.hashSync(req.body.password, 10);
-    const result = await addUser(req.body);
-    if (result.user_id) {
-        res.status(201);
-        res.json({message: 'New user added.', result});
-    } else {
-        res.sendStatus(400);
+// GET BY ID
+const getUserById = async (req, res, next) => {
+    try {
+        const user = await findUserById(req.params.id);
+
+        if (user) {
+            res.json(user);
+        } else {
+            const error = new Error('User not found');
+            error.status = 404;
+            next(error);
+        }
+    } catch (err) {
+        next(err);
     }
 };
 
-// PUT /api/v1/users/:id - return hard coded json response:
-// {message: 'user item updated.'}
+// POST
+const postUser = async (req, res, next) => {
+    try {
+        // hash password
+        req.body.password = await bcrypt.hash(req.body.password, 10);
 
-const putUser = async (req, res) => {
-    const result = await modifyUser(req.body, req.params.id);
-    if (result.message === 'success') {
-        res.json({message: 'user item updated.'});
-    } else {
-        res.sendStatus(400);
+        const result = await addUser(req.body);
+
+        if (result.user_id) {
+            res.status(201).json({
+                message: 'New user added.',
+                result,
+            });
+        } else {
+            const error = new Error('User not created');
+            error.status = 400;
+            next(error);
+        }
+    } catch (err) {
+        next(err);
     }
 };
 
-const deleteUser = async (req, res) => {
-    const result = await removeUser(req.params.id);
-    if (result.message === 'success') {
-        res.json({message: 'user item deleted.'});
-    } else {
-        res.sendStatus(400);
+// PUT
+const putUser = async (req, res, next) => {
+    try {
+        const result = await modifyUser(req.body, req.params.id);
+
+        if (result.message === 'success') {
+            res.json({ message: 'user item updated.' });
+        } else {
+            const error = new Error('User not found');
+            error.status = 404;
+            next(error);
+        }
+    } catch (err) {
+        next(err);
     }
 };
 
-export {getUser, getUserById, postUser, putUser, deleteUser};
+// DELETE
+const deleteUser = async (req, res, next) => {
+    try {
+        const result = await removeUser(req.params.id);
+
+        if (result.message === 'success') {
+            res.json({ message: 'user item deleted.' });
+        } else {
+            const error = new Error('User not found');
+            error.status = 404;
+            next(error);
+        }
+    } catch (err) {
+        next(err);
+    }
+};
+
+export { getUser, getUserById, postUser, putUser, deleteUser };
